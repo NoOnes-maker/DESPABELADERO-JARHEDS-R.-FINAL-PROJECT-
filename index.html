@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hanoi Workshop | SWI-Prolog + JavaScript</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="mark" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div>
+      <h1>Hanoi Workshop</h1>
+      <p>SWI-Prolog solves it. JavaScript moves it.</p>
+    </div>
+  </div>
+  <div class="controls">
+    <label class="ctl">Disks
+      <select id="diskCount">
+        <option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
+        <option value="6">6</option><option value="7">7</option>
+      </select>
+    </label>
+    <label class="ctl">Speed
+      <select id="speed">
+        <option value="1200">0.5x</option><option value="700" selected>1x</option>
+        <option value="350">2x</option><option value="180">4x</option>
+      </select>
+    </label>
+    <button id="btnPlay" class="btn primary" data-mode="play">
+      <svg id="playIcon" viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path d="M4 4l12 6-12 6z"/></svg>
+      <span id="playText">Auto Solve</span>
+    </button>
+    <button id="btnSound" class="btn">🔊 Sound on</button>
+    <button id="btnReset" class="btn">Reset</button>
+  </div>
+</header>
+
+<main class="grid">
+  <section class="col">
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow">Drag the top disk, or hit Auto Solve</span>
+        <span id="stepCounter" class="pill">Move 0 / 7</span>
+      </div>
+      <div id="stage" class="stage">
+        <div class="base"></div>
+        <div class="peg"><i class="rod"></i><b>left</b></div>
+        <div class="peg"><i class="rod"></i><b>center</b></div>
+        <div class="peg"><i class="rod"></i><b>right</b></div>
+        <div id="disks" class="disks"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="stats">
+        <div><small>Your moves</small><strong id="statYou">0</strong></div>
+        <div><small>Prolog optimal</small><strong id="statOpt">7</strong></div>
+        <div><small>Efficiency</small><strong id="statEff">-</strong></div>
+      </div>
+      <p id="hint" class="hint"></p>
+      <div class="finish">
+        <button id="btnDone" class="btn good">Done</button>
+        <div id="autoPrompt" class="prompt hidden">
+          <p>Want to watch Prolog solve it?</p>
+          <button id="btnYes" class="btn primary">Yes, show me</button>
+          <button id="btnNo" class="btn">No thanks</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card term">
+      <div class="term-head">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="term-title">swipl</span>
+        <button id="btnClear" class="link">clear</button>
+      </div>
+      <div id="console" class="log"></div>
+    </div>
+  </section>
+
+  <aside class="col">
+    <div class="card">
+      <div class="card-head">
+        <span class="eyebrow">hanoi.pl</span>
+        <span id="engine" class="pill engine">Solver: checking...</span>
+      </div>
+      <div class="code">
+        <div id="codeBase" class="clause"><span class="c">% Base case: nothing left to move</span>
+<span class="f">hanoi</span>(0, _, _, _, []).</div>
+        <div id="codeRec" class="clause"><span class="c">% Recursive case: move N disks</span>
+<span class="f">hanoi</span>(N, From, To, Via, Moves) :-
+    N &gt; 0,
+    M <span class="k">is</span> N - 1,
+    hanoi(M, From, Via, To, Before),
+    hanoi(M, Via, To, From, After),
+    append(Before, [move(N, From, To)|After], Moves).</div>
+      </div>
+      <div class="notes">
+        <h2>How it fits together</h2>
+        <ul>
+          <li><b>From</b> is the source peg (<code>left</code>), <b>To</b> the target (<code>right</code>), <b>Via</b> the spare (<code>center</code>).</li>
+          <li><code>server.pl</code> answers <code>/api/solve?n=N</code> with the move list Prolog computes.</li>
+          <li><code>script.js</code> animates each <code>move(Disk, From, To)</code>. No server? It runs the same algorithm itself.</li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<footer>Hanoi Workshop · SWI-Prolog + JavaScript · 2<sup>n</sup> - 1 moves, always</footer>
+<script src="script.js"></script>
+</body>
+</html>
